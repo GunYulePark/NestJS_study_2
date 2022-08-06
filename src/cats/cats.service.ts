@@ -1,12 +1,31 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { CatsRepository } from './cats.repository';
+import { Cat } from './cats.schema';
 import { CatRequestDto } from './dto/cats.request.dto';
 
 @Injectable()
 export class CatsService {
   // Mongoose에 직접 연결하던 거 CatsRepository를 통해 중개받기
   constructor(private readonly catsRepository: CatsRepository) {}
+
+  async getAllCat() {
+    const allCat = await this.catsRepository.findAll(); // 모든 cat을 db에서 꺼내온 다음에 필요한 데이터들만 넘겨준다.
+    const readOnlyCats = allCat.map((cat) => cat.readOnlyData); // readOnly로 넣어준다.
+    return readOnlyCats;
+  }
+  async uploadImg(cat: Cat, files: Express.Multer.File[]) {
+    const fileName = `cats/${files[0].filename}`;
+
+    console.log(fileName);
+
+    const newCat = await this.catsRepository.findByIdAndUpdateImg(
+      cat.id,
+      fileName,
+    );
+    console.log(newCat);
+    return newCat;
+  }
 
   async signUp(body: CatRequestDto) {
     const { email, name, password } = body;
