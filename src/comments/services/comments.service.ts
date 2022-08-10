@@ -22,11 +22,12 @@ export class CommentsService {
   }
 
   async createComment(id: string, commentData: CommentsCreateDto) {
+    // 여기서 param으로 받은 id는 uri뒷부분에 있는 id이자, info_id
     try {
       const targetCat = await this.catsRepository.findCatByIdWithoutPassword(
         id,
       );
-      const { contents, author } = commentData; // 구조분해 할당 string, Types.ObjectId
+      const { contents, author } = commentData; // 구조분해 할당(body로 받은 commentData를 contents와 author로 쪼개받기) string, Types.ObjectId
       // 바로 author를 넣어도 되지만, 변조 가능성이 있기 때문에 catsRepository에 해당하는 author이 있는지 확인.
       const validateAuthor =
         await this.catsRepository.findCatByIdWithoutPassword(author);

@@ -14,8 +14,10 @@ export class CatsService {
     const readOnlyCats = allCat.map((cat) => cat.readOnlyData); // readOnly로 넣어준다.
     return readOnlyCats;
   }
+
   async uploadImg(cat: Cat, files: Express.Multer.File[]) {
-    const fileName = `cats/${files[0].filename}`;
+    const fileName = `cats/${files[0].filename}`; // key는 파일 경로를 뜻한다.
+    // db에는 img 저장. f.e.에는 이 img url 보내준다.
 
     console.log(fileName);
 

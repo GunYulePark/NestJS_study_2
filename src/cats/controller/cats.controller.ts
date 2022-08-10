@@ -19,7 +19,7 @@ import { CurrentUser } from 'src/common/decorators/user.decorator';
 import { Cat } from '../cats.schema';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from 'src/common/utils/multer.options';
-
+import { AwsService } from '../cats.aws.service';
 @Controller('cats')
 @UseInterceptors(SuccessInterceptor)
 @UseFilters(HttpExceptionFilter)
@@ -27,6 +27,7 @@ export class CatsController {
   constructor(
     private readonly catsService: CatsService,
     private readonly authService: AuthService,
+    private readonly awsService: AwsService,
   ) {}
 
   @ApiOperation({ summary: '현재 고양이 가져오기' })
@@ -64,18 +65,29 @@ export class CatsController {
   }
 
   @ApiOperation({ summary: '고양이 이미지 업로드' })
-  @UseInterceptors(FilesInterceptor('image', 10, multerOptions('cats'))) // image는 f.e.에서 보내준 파일 이름
   @UseGuards(JwtAuthGuard)
   @Post('upload')
-  uploadCatImg(
-    @UploadedFiles() files: Array<Express.Multer.File>,
-    @CurrentUser() cat: Cat,
-  ) {
-    console.log(files);
-    // return 'uploadImg';
-    // return { image: `http://localhost:8000/media/cats/${files[0].filename}` };
-    return this.catsService.uploadImg(cat, files);
+  @UseInterceptors(FilesInterceptor('image', 10, multerOptions('cats')))
+  async uploadCatImg(@UploadedFiles() file: Express.Multer.File) {
+    console.log(file);
+    return this.awsService.uploadFileToS3('cats', file);
   }
+
+  @Post('cats')
+  getImageUrl(@Body('key') key: string) {
+    return this.awsService.getAwsS3FileUrl(key);
+  }
+
+  // @ApiOperation({ summary: '고양이 이미지 업로드' })
+  // @UseInterceptors(FilesInterceptor('image', 10, multerOptions('cats')))
+  // @UseGuards(JwtAuthGuard)
+  // @Post('upload')
+  // uploadCatImg(
+  //   @UploadedFiles() files: Array<Express.Multer.File>,
+  //   @CurrentUser() cat: Cat,
+  // ) {
+  //   return this.catsService.uploadImg(cat, files);
+  // }
 
   @ApiOperation({ summary: '모든 고양이 가져오기' })
   @Get('all')
