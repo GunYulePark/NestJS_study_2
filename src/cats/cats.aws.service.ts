@@ -4,7 +4,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PromiseResult } from 'aws-sdk/lib/request';
 
-// sharp
+// sharp package로 이미지 변환 가능
 
 @Injectable()
 export class AwsService {
@@ -32,7 +32,7 @@ export class AwsService {
     try {
       const key = `${folder}/${Date.now()}_${path.basename(
         file.originalname,
-      )}`.replace(/ /g, ''); // 정규표현식. replace: 특정한 글자에 대해서 다른 글자로. 여기서 기느응ㄴ 모든 공백을 지워주기.
+      )}`.replace(/ /g, ''); // 정규표현식. replace: 특정한 글자에 대해서 다른 글자로. 여기서 기능은 모든 공백을 지워주기.
 
       const s3Object = await this.awsS3
         .putObject({

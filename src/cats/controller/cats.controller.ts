@@ -65,7 +65,7 @@ export class CatsController {
   }
 
   @ApiOperation({ summary: '고양이 이미지 업로드' })
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Post('upload')
   @UseInterceptors(FilesInterceptor('image', 10, multerOptions('cats')))
   async uploadCatImg(@UploadedFiles() file: Express.Multer.File) {
